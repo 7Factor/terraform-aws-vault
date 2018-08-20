@@ -1,0 +1,4 @@
+/.terraform
+/backend.tf
+/keys
+/us-east-1.dev.tfvars
