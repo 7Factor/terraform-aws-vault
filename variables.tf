@@ -6,8 +6,14 @@ variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }
 
-variable subnet_id {
-  description = "The subnet ID you'll be installing vault into. Again, we make no assumptions. This should be large enough to support your cluster."
+variable ui_public_subnets {
+  type = "list"
+  description = "The public subnet ID you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
+}
+
+variable vault_private_subnets {
+  type = "list"
+  description = "The private subnet ID you'll be installing vault into. Again, we make no assumptions. This should be large enough to support your cluster."
 }
 
 variable vault_ssh_key_name {
@@ -20,7 +26,7 @@ variable vault_image {
 }
 
 # security group variables
-variable vault_web_ingress_cidr {
+variable vault_ui_ingress_cidr {
   default     = "0.0.0.0/0"
   description = "The CIDR block from whence web traffic may come. Defaults to anywhere, but override it as necessary. This is applied to the ELB."
 }
@@ -29,20 +35,24 @@ variable vault_ssh_ingress_cidr {
   description = "The CIDR block from whence SSH traffic may come. Set this to your bastion host or your VPN IP range."
 }
 
-variable vault_web_instance_type {
-  description = "The web instance type. Usually around an m3.large gets it done, but do what you want."
+variable vault_ui_instance_type {
+  description = "The ui instance type. Usually around an m3.large gets it done, but do what you want."
 }
 
-variable vault_web_count {
+variable vault_ui_count {
   default     = 2
-  description = "The number of web boxes to run. Defaults to a pair."
+  description = "The number of ui boxes to run. Defaults to a pair."
 }
 
 variable vault_ui_cert_arn {
   description = "The ARN to the SSL cert we'll apply to the ELB."
 }
 
-variable vault_web_conf_dir {
+variable vault_ui_ssl_policy {
+  description = "Vault UI SSL policy to apply to the ELB."
+}
+
+variable vault_ui_conf_dir {
   description = "The path to the config file for the vault ui server."
 }
 
