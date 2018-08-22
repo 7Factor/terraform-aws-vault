@@ -123,50 +123,11 @@ resource "aws_security_group" "vault_httplb_sg" {
 #---------------------------------------------------------
 resource "aws_iam_instance_profile" "vault_instance_profile" {
   name = "vault-ec2-role"
-  role = "${aws_iam_role.vault_role.name}"
+  role = "${aws_iam_service_linked_role.vault_dynamodb_role.name}"
 }
 
-resource "aws_iam_role_policy_attachment" "terraformer_permissions" {
-  role       = "${aws_iam_role.vault_role.name}"
-  policy_arn = "${aws_iam_policy.vault_policy.arn}"
-}
-
-resource "aws_iam_role" "vault_role" {
-  name = "VaultEC2"
-  description = "Houses required permissions for Vault EC2 boxes."
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "vault_policy" {
-  name = "VaultDynamoDB"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "dynamodb:*",
-      "Resource": "arn:aws:dynamodb:${data.aws_region.current.name}::table/VaultData"
-    }
-  ]
-}
-EOF
+resource "aws_iam_service_linked_role" "vault_dynamodb_role" {
+  aws_service_name = "dynamodb.amazonaws.com"
 }
 
 #---------------------------------------------------------
