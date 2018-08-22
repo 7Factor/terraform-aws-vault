@@ -127,7 +127,7 @@ resource "aws_iam_instance_profile" "vault_instance_profile" {
 }
 
 resource "aws_iam_service_linked_role" "vault_dynamodb_role" {
-  aws_service_name = "dynamodb.amazonaws.com"
+  aws_service_name = "dax.amazonaws.com"
 }
 
 #---------------------------------------------------------
@@ -214,6 +214,7 @@ resource "aws_instance" "vault_ui" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y update",
+      "sleep 5",
       "sudo docker pull ${var.vault_image}",
       "sudo mv ~/conf /etc/vault/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
@@ -347,6 +348,7 @@ resource "aws_instance" "vault" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y update",
+      "sleep 5",
       "sudo docker pull ${var.vault_image}",
       "sudo mv ~/conf /etc/vault/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
