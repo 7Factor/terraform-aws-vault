@@ -228,16 +228,16 @@ resource "aws_instance" "vault_ui" {
     }
   }
 
-  provisioner "file" {
-    source      = "${var.vault_ui_conf_dir}"
-    destination = "~/conf/"
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
+//  provisioner "file" {
+//    source      = "${var.vault_ui_conf_dir}"
+//    destination = "~/conf/"
+//
+//    connection {
+//      type        = "ssh"
+//      user        = "ec2-user"
+//      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+//    }
+//  }
 
   provisioner "file" {
     source = "${path.module}/conf/vault.hcl"
@@ -255,7 +255,7 @@ resource "aws_instance" "vault_ui" {
       "sudo yum -y update",
       "sleep 5",
       "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf /etc/vault/",
+      "sudo mv ~/conf/* /etc/vault/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
@@ -362,16 +362,16 @@ resource "aws_instance" "vault" {
     }
   }
 
-  provisioner "file" {
-    source      = "${var.vault_conf_dir}"
-    destination = "~/conf/"
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
+//  provisioner "file" {
+//    source      = "${var.vault_conf_dir}"
+//    destination = "~/conf/"
+//
+//    connection {
+//      type        = "ssh"
+//      user        = "ec2-user"
+//      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+//    }
+//  }
 
   provisioner "file" {
     source      = "${path.module}/conf/vault.hcl"
@@ -389,7 +389,7 @@ resource "aws_instance" "vault" {
       "sudo yum -y update",
       "sleep 5",
       "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf /etc/vault/",
+      "sudo mv ~/conf/* /etc/vault/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
