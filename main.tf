@@ -121,23 +121,52 @@ resource "aws_security_group" "vault_httplb_sg" {
 # Vault iam role for ui and server boxes so they can talk
 # to dynamo db
 #---------------------------------------------------------
-// TODO: figure out how to make a role policy from here
-//resource "aws_iam_role" "vault_role" {
-//  name = "vault-role"
-//
-//  assume_role_policy = <<EOF
-//{
-//  "Version": "2012-10-17",
-//  "Statement": [
-//    {
-//      "Effect": "Allow",
-//      "Action": "dynamodb:*",
-//      "Resource": "arn:aws:dynamodb:::vault-data"
-//    }
-//  ]
-//}
-//EOF
-//}
+resource "aws_iam_instance_profile" "vault_instance_profile" {
+  name = "vault-ec2-role"
+  role = "${aws_iam_role.vault_role.name}"
+}
+
+resource "aws_iam_role" "vault_role" {
+  name = "VaultEC2"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "vault_role_policy" {
+  name = "VaultDynamoDB"
+  role = "${aws_iam_role.vault_role.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:dynamodb:${data.aws_region.current.name}::table/VaultData"
+      ]
+    }
+  ]
+}
+EOF
+}
 
 #---------------------------------------------------------
 # Vault ui server farm. We'll go with a passed in
@@ -172,8 +201,7 @@ resource "aws_instance" "vault_ui" {
   # across the configured subnets.
   subnet_id     = "${var.ui_public_subnets[count.index % length(var.ui_public_subnets)]}"
   key_name      = "${var.vault_ssh_key_name}"
-//  iam_instance_profile = "${aws_iam_role.vault_role.name}"
-  iam_instance_profile = "vault_role"
+  iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_ui_sg.id}",
@@ -267,7 +295,7 @@ resource "aws_lb_target_group" "vault_lb_target" {
     unhealthy_threshold = 2
     timeout             = 3
     path                = "/ui"
-    port                = 8820
+    port                = 8200
     interval            = 30
   }
 }
@@ -306,8 +334,7 @@ resource "aws_instance" "vault" {
   # across the configured subnets.
   subnet_id     = "${var.vault_private_subnets[count.index % length(var.vault_private_subnets)]}"
   key_name      = "${var.vault_ssh_key_name}"
-//  iam_instance_profile = "${aws_iam_role.vault_role.name}"
-  iam_instance_profile = "vault_role"
+  iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_ssh_access.id}",
