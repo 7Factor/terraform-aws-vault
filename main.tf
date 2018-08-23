@@ -255,7 +255,7 @@ resource "aws_instance" "vault_ui" {
       "sudo yum -y update",
       "sleep 5",
       "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf/* /etc/vault/",
+      "sudo mv ~/conf/* /etc/vault/conf/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
@@ -389,7 +389,7 @@ resource "aws_instance" "vault" {
       "sudo yum -y update",
       "sleep 5",
       "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf/* /etc/vault/",
+      "sudo mv ~/conf/* /etc/vault/conf/",
       "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
