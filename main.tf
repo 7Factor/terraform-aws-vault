@@ -272,7 +272,7 @@ resource "aws_lb" "vault_lb" {
   load_balancer_type = "application"
 
   subnets = [
-    "${var.ui_private_subnets}"
+    "${var.ui_public_subnets}"
   ]
 
   security_groups = [
