@@ -162,7 +162,7 @@ resource "aws_iam_policy" "vault_policy" {
     {
       "Effect": "Allow",
       "Action": "dynamodb:*",
-      "Resource": "arn:aws:dynamodb:${data.aws_region.current.name}::table/VaultData"
+      "Resource": "*"
     }
   ]
 }
