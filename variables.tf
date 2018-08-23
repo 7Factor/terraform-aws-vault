@@ -6,7 +6,7 @@ variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }
 
-variable ui_public_subnets {
+variable ui_private_subnets {
   type = "list"
   description = "The public subnet ID you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
 }

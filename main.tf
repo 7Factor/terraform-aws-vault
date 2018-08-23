@@ -200,7 +200,7 @@ resource "aws_instance" "vault_ui" {
 
   # We're doing some magic here to allow for any number of count that's evenly distributed
   # across the configured subnets.
-  subnet_id     = "${var.ui_public_subnets[count.index % length(var.ui_public_subnets)]}"
+  subnet_id     = "${var.ui_private_subnets[count.index % length(var.ui_private_subnets)]}"
   key_name      = "${var.vault_ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
 
@@ -272,7 +272,7 @@ resource "aws_lb" "vault_lb" {
   load_balancer_type = "application"
 
   subnets = [
-    "${var.ui_public_subnets}"
+    "${var.ui_private_subnets}"
   ]
 
   security_groups = [
