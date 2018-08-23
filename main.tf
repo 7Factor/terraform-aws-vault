@@ -240,7 +240,7 @@ resource "aws_instance" "vault_ui" {
 //  }
 
   provisioner "file" {
-    source = "${path.module}/conf/vault.hcl"
+    source = "${path.module}/conf/vault-ui.hcl"
     destination = "~/conf/vault-ui.hcl"
 
     connection {
