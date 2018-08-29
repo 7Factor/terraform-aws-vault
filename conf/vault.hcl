@@ -1,4 +1,4 @@
-ui = false
+ui = true
 
 api_addr = "https://0.0.0.0:8200"
 cluster_addr = "https://0.0.0.0:8201"
@@ -16,6 +16,10 @@ listener "tcp" {
 storage "dynamodb" {
   ha_enabled = "true"
   table      = "VaultData"
+}
+
+storage "s3" {
+  bucket     = "vault-data"
 }
 
 default_lease_ttl = "168h"

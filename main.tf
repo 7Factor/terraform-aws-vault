@@ -11,11 +11,12 @@ data "aws_region" "current" {
 # SGs for access to vault servers. One for the ui
 # and another for SSH access and another for DB access.
 #---------------------------------------------------------
-resource "aws_security_group" "vault_ui_sg" {
-  name        = "vault-ui-sg-${data.aws_region.current.name}"
-  description = "Security group for all vault ui servers in ${data.aws_region.current.name}."
+resource "aws_security_group" "vault_sg" {
+  name        = "vault-sg-${data.aws_region.current.name}"
+  description = "Security group for all vault servers in ${data.aws_region.current.name}."
   vpc_id      = "${var.vpc_id}"
 
+  # access 8200 for api / ui
   ingress {
     from_port       = 8200
     to_port         = 8200
@@ -23,30 +24,12 @@ resource "aws_security_group" "vault_ui_sg" {
     security_groups = ["${aws_security_group.vault_httplb_sg.id}"]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Application = "vault"
-    Cluster     = "${var.cluster_name}"
-    Name        = "Vault UI"
-  }
-}
-
-resource "aws_security_group" "vault_sg" {
-  name        = "vault-sg-${data.aws_region.current.name}"
-  description = "Opens all the appropriate vault ports in ${data.aws_region.current.name}"
-  vpc_id      = "${var.vpc_id}"
-
+  # access 8201 for cluster communication
   ingress {
     from_port       = 8201
     to_port         = 8201
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.vault_ui_sg.id}"]
+    security_groups = ["${aws_security_group.vault_sg.id}"]
   }
 
   egress {
@@ -59,7 +42,7 @@ resource "aws_security_group" "vault_sg" {
   tags {
     Application = "vault"
     Cluster     = "${var.cluster_name}"
-    Name        = "Vault Workers"
+    Name        = "Vault"
   }
 }
 
@@ -100,7 +83,7 @@ resource "aws_security_group" "vault_httplb_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${var.vault_ui_ingress_cidr}"]
+    cidr_blocks = ["${var.vault_ingress_cidr}"]
   }
 
   egress {
@@ -118,7 +101,7 @@ resource "aws_security_group" "vault_httplb_sg" {
 }
 
 #---------------------------------------------------------
-# Vault iam role for ui and server boxes so they can talk
+# Vault iam role for vault boxes so they can talk
 # to dynamo db
 #---------------------------------------------------------
 resource "aws_iam_instance_profile" "vault_instance_profile" {
@@ -152,6 +135,7 @@ resource "aws_iam_role" "vault_role" {
 EOF
 }
 
+# todo: tighten up this policy
 resource "aws_iam_policy" "vault_policy" {
   name = "VaultDynamoDB"
 
@@ -163,6 +147,11 @@ resource "aws_iam_policy" "vault_policy" {
       "Effect": "Allow",
       "Action": "dynamodb:*",
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
     }
   ]
 }
@@ -173,12 +162,12 @@ EOF
 # Vault ui server farm. We'll go with a passed in
 # number of boxes and a load balancer.
 #---------------------------------------------------------
-data "aws_ami" "ecs_linux" {
+data "aws_ami" "aws_linux" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
+    values = ["amzn2-ami-*-x86_64-gp2"]
   }
 
   filter {
@@ -192,25 +181,25 @@ data "aws_ami" "ecs_linux" {
   }
 }
 
-resource "aws_instance" "vault_ui" {
-  count = "${var.vault_ui_count}"
+resource "aws_instance" "vault" {
+  count = "${var.vault_count}"
 
-  ami           = "${data.aws_ami.ecs_linux.id}"
-  instance_type = "${var.vault_ui_instance_type}"
+  ami           = "${data.aws_ami.aws_linux.id}"
+  instance_type = "${var.vault_instance_type}"
 
   # We're doing some magic here to allow for any number of count that's evenly distributed
   # across the configured subnets.
-  subnet_id     = "${var.ui_private_subnets[count.index % length(var.ui_private_subnets)]}"
+  subnet_id     = "${var.private_subnets[count.index % length(var.private_subnets)]}"
   key_name      = "${var.vault_ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
 
   vpc_security_group_ids = [
-    "${aws_security_group.vault_ui_sg.id}",
+    "${aws_security_group.vault_sg.id}",
     "${aws_security_group.vault_ssh_access.id}",
   ]
 
   tags {
-    Name        = "vault-ui"
+    Name        = "vault"
     Application = "vault"
     Cluster     = "${var.cluster_name}"
   }
@@ -240,8 +229,8 @@ resource "aws_instance" "vault_ui" {
 //  }
 
   provisioner "file" {
-    source = "${path.module}/conf/vault-ui.hcl"
-    destination = "~/conf/vault-ui.hcl"
+    source = "${path.module}/conf/vault.hcl"
+    destination = "~/conf/vault.hcl"
 
     connection {
       type = "ssh"
@@ -256,7 +245,7 @@ resource "aws_instance" "vault_ui" {
       "sleep 10",
       "sudo docker pull ${var.vault_image}",
       "sudo mv ~/conf/* /etc/vault/conf/",
-      "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
+      "docker run --cap-add=IPC_LOCK -d --name vault -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
     connection {
@@ -272,7 +261,7 @@ resource "aws_lb" "vault_lb" {
   load_balancer_type = "application"
 
   subnets = [
-    "${var.ui_public_subnets}"
+    "${var.public_subnets}"
   ]
 
   security_groups = [
@@ -303,9 +292,9 @@ resource "aws_lb_target_group" "vault_lb_target" {
 }
 
 resource "aws_lb_target_group_attachment" "vault_lb_target_attachments" {
-  count            = "${var.vault_ui_count}"
+  count            = "${var.vault_count}"
   target_group_arn = "${aws_lb_target_group.vault_lb_target.arn}"
-  target_id        = "${element(aws_instance.vault_ui.*.id, count.index)}"
+  target_id        = "${element(aws_instance.vault.*.id, count.index)}"
   port             = 8200
 }
 
@@ -313,8 +302,8 @@ resource "aws_lb_listener" "vault_lb_listener" {
   load_balancer_arn = "${aws_lb.vault_lb.arn}"
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "${var.vault_ui_ssl_policy}"
-  certificate_arn   = "${var.vault_ui_cert_arn}"
+  ssl_policy        = "${var.vault_ssl_policy}"
+  certificate_arn   = "${var.vault_cert_arn}"
 
   default_action {
     target_group_arn = "${aws_lb_target_group.vault_lb_target.arn}"
@@ -322,81 +311,3 @@ resource "aws_lb_listener" "vault_lb_listener" {
   }
 }
 
-#---------------------------------------------------------
-# Vault farm.
-#---------------------------------------------------------
-resource "aws_instance" "vault" {
-  count      = "${var.vault_count}"
-  depends_on = ["aws_lb.vault_lb"]
-
-  ami           = "${data.aws_ami.ecs_linux.id}"
-  instance_type = "${var.vault_instance_type}"
-
-  # We're doing some magic here to allow for any number of count that's evenly distributed
-  # across the configured subnets.
-  subnet_id     = "${var.vault_private_subnets[count.index % length(var.vault_private_subnets)]}"
-  key_name      = "${var.vault_ssh_key_name}"
-  iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
-
-  vpc_security_group_ids = [
-    "${aws_security_group.vault_ssh_access.id}",
-    "${aws_security_group.vault_sg.id}",
-  ]
-
-  tags {
-    Name        = "vault"
-    Application = "vault"
-    Cluster     = "${var.cluster_name}"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p /etc/vault/conf",
-      "mkdir -p ~/conf",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
-
-//  provisioner "file" {
-//    source      = "${var.vault_conf_dir}"
-//    destination = "~/conf/"
-//
-//    connection {
-//      type        = "ssh"
-//      user        = "ec2-user"
-//      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-//    }
-//  }
-
-  provisioner "file" {
-    source      = "${path.module}/conf/vault.hcl"
-    destination = "~/conf/vault.hcl"
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo yum -y update",
-      "sleep 10",
-      "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf/* /etc/vault/conf/",
-      "docker run --cap-add=IPC_LOCK -d --name vault_ui -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
-}
