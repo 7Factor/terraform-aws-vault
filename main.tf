@@ -24,6 +24,25 @@ resource "aws_security_group" "vault_sg" {
     security_groups = ["${aws_security_group.vault_httplb_sg.id}"]
   }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Application = "vault"
+    Cluster     = "${var.cluster_name}"
+    Name        = "Vault"
+  }
+}
+
+resource "aws_security_group" "vault_cluster_sg" {
+  name        = "vault-sg-${data.aws_region.current.name}"
+  description = "Security group for all vault servers in ${data.aws_region.current.name}."
+  vpc_id      = "${var.vpc_id}"
+
   # access 8201 for cluster communication
   ingress {
     from_port       = 8201
@@ -195,6 +214,7 @@ resource "aws_instance" "vault" {
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_sg.id}",
+    "${aws_security_group.vault_cluster_sg.id}",
     "${aws_security_group.vault_ssh_access.id}",
   ]
 
@@ -256,6 +276,11 @@ resource "aws_instance" "vault" {
   }
 }
 
+resource "aws_s3_bucket" "vault-data" {
+  bucket = "vault-data"
+}
+
+# load blanacer
 resource "aws_lb" "vault_lb" {
   name = "vault-lb-${data.aws_region.current.name}"
   load_balancer_type = "application"
