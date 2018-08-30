@@ -39,7 +39,7 @@ resource "aws_security_group" "vault_sg" {
 }
 
 resource "aws_security_group" "vault_cluster_sg" {
-  name        = "vault-sg-${data.aws_region.current.name}"
+  name        = "vault-cluster-sg-${data.aws_region.current.name}"
   description = "Security group for all vault servers in ${data.aws_region.current.name}."
   vpc_id      = "${var.vpc_id}"
 
@@ -262,7 +262,9 @@ resource "aws_instance" "vault" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y update",
-      "sleep 10",
+      "sudo yum -y install docker",
+      "sudo service docker start",
+      "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
       "sudo mv ~/conf/* /etc/vault/conf/",
       "docker run --cap-add=IPC_LOCK -d --name vault -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
@@ -277,7 +279,7 @@ resource "aws_instance" "vault" {
 }
 
 resource "aws_s3_bucket" "vault-data" {
-  bucket = "vault-data"
+  bucket = "7fdev-vault"
 }
 
 # load blanacer
