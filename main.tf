@@ -267,7 +267,7 @@ resource "aws_instance" "vault" {
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
       "sudo mv ~/conf/* /etc/vault/conf/",
-      "docker run --cap-add=IPC_LOCK -d --name vault -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
+      "sudo docker run --cap-add=IPC_LOCK -d --name vault -p 8200:8200 -p 8201:8201 -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server"
     ]
 
     connection {

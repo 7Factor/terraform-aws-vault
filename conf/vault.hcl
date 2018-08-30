@@ -13,7 +13,7 @@ listener "tcp" {
   tls_disable = "true"
 }
 
-storage "dynamodb" {
+ha_storage "dynamodb" {
   ha_enabled = "true"
   table      = "VaultData"
 }
