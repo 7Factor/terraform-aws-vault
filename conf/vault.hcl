@@ -19,7 +19,7 @@ ha_storage "dynamodb" {
 }
 
 storage "s3" {
-  bucket     = "vault-data"
+  bucket     = "7fdev-vault"
 }
 
 default_lease_ttl = "168h"
