@@ -59,7 +59,7 @@ resource "aws_instance" "vault" {
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /etc/vault/conf",
-      "mkdir -p ~/conf",
+      "sudo chown -R ec2-user:ec2-user /etc/vault",
     ]
 
     connection {
