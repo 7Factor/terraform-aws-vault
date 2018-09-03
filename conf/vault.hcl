@@ -1,5 +1,4 @@
 ui = true
-
 api_addr = "https://0.0.0.0:8200"
 cluster_addr = "https://0.0.0.0:8201"
 
@@ -23,5 +22,4 @@ storage "s3" {
 }
 
 default_lease_ttl = "168h"
-
 max_lease_ttl = "720h"

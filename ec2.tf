@@ -17,8 +17,8 @@ resource "aws_instance" "vault" {
   ]
 
   tags {
-    Name        = "Vault ${count.index}"
-    Cluster     = "${var.cluster_name}"
+    Name    = "Vault ${count.index}"
+    Cluster = "${var.cluster_name}"
   }
 
   provisioner "remote-exec" {
@@ -72,7 +72,7 @@ resource "aws_iam_instance_profile" "vault_instance_profile" {
   role = "${aws_iam_role.vault_role.name}"
 }
 
-resource "aws_iam_role_policy_attachment" "terraformer_permissions" {
+resource "aws_iam_role_policy_attachment" "vault_permissions" {
   role       = "${aws_iam_role.vault_role.name}"
   policy_arn = "${aws_iam_policy.vault_policy.arn}"
 }

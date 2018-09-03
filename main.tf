@@ -24,7 +24,3 @@ data "aws_ami" "aws_linux" {
     values = ["amazon"]
   }
 }
-
-resource "aws_s3_bucket" "vault-data" {
-  bucket = "7fdev-vault"
-}
