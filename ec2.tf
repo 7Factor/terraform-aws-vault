@@ -13,12 +13,11 @@ resource "aws_instance" "vault" {
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_sg.id}",
-    "${aws_security_group.utility_accessible_sg.id}",
+    "${var.utility_accessible_sg}",
   ]
 
   tags {
     Name        = "Vault ${count.index}"
-    Application = "Vault"
     Cluster     = "${var.cluster_name}"
   }
 
@@ -31,6 +30,7 @@ resource "aws_instance" "vault" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
+      host        = "${self.private_ip}"
       private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
     }
   }
@@ -42,6 +42,7 @@ resource "aws_instance" "vault" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
+      host        = "${self.private_ip}"
       private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
     }
   }
@@ -60,6 +61,7 @@ resource "aws_instance" "vault" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
+      host        = "${self.private_ip}"
       private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
     }
   }

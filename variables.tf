@@ -44,18 +44,10 @@ variable vault_ingress_cidr {
   description = "The CIDR block from whence web traffic may come. Defaults to anywhere, but override it as necessary. This is applied to the ELB."
 }
 
-variable vault_ssh_ingress_cidr {
-  description = "The CIDR block from whence SSH traffic may come. Set this to your bastion host or your VPN IP range."
-}
-
 variable utility_accessible_sg {
   description = "Pass in the ID of your access security group here."
 }
 
 variable vault_ssl_policy {
   description = "Vault UI SSL policy to apply to the ELB."
-}
-
-variable vault_conf_dir {
-  description = "The path to the config file for the vault ui server."
 }

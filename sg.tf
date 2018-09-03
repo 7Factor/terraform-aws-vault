@@ -19,9 +19,8 @@ resource "aws_security_group" "vault_sg" {
   }
 
   tags {
-    Application = "vault"
     Cluster     = "${var.cluster_name}"
-    Name        = "Vault access"
+    Name        = "Vault Boxes"
   }
 }
 
@@ -54,8 +53,7 @@ resource "aws_security_group" "vault_httplb_sg" {
   }
 
   tags {
-    Application = "vault"
     Cluster     = "${var.cluster_name}"
-    Name        = "Vault LB Access"
+    Name        = "Vault Load Balancer"
   }
 }
