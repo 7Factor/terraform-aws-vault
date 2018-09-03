@@ -1,3 +1,38 @@
+data "template_file" "vault_config" {
+  template = <<EOF
+ui = true
+api_addr = "https://0.0.0.0:8200"
+cluster_addr = "https://0.0.0.0:8201"
+
+listener "tcp" {
+  address = "0.0.0.0:8200"
+  tls_disable = "true"
+}
+
+listener "tcp" {
+  address = "0.0.0.0:8201"
+  tls_disable = "true"
+}
+
+ha_storage "dynamodb" {
+  ha_enabled = "true"
+  table      = "Vault"
+}
+
+storage "s3" {
+  bucket     = "$${vault_data_bucket}"
+}
+
+default_lease_ttl = "168h"
+max_lease_ttl = "720h"
+
+EOF
+
+  vars {
+    vault_data_bucket = "${var.vault_data_bucket}"
+  }
+}
+
 resource "aws_instance" "vault" {
   count = "${var.vault_count}"
 
@@ -36,8 +71,8 @@ resource "aws_instance" "vault" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/conf/vault.hcl"
-    destination = "~/conf/vault.hcl"
+    content     = "${data.template_file.vault_config.rendered}"
+    destination = "/etc/vault/conf/vault.hcl"
 
     connection {
       type        = "ssh"
@@ -54,7 +89,6 @@ resource "aws_instance" "vault" {
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo mv ~/conf/* /etc/vault/conf/",
       "sudo docker run --cap-add=IPC_LOCK -d --name vault --network host -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server",
     ]
 

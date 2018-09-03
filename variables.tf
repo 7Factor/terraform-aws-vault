@@ -51,3 +51,7 @@ variable utility_accessible_sg {
 variable vault_ssl_policy {
   description = "Vault UI SSL policy to apply to the ELB."
 }
+
+variable vault_data_bucket {
+  description = "The bucket name to store encrypted vault information."
+}
