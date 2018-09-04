@@ -58,7 +58,7 @@ resource "aws_instance" "vault" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /etc/vault/conf",
+      "sudo mkdir -p /etc/vault/config",
       "sudo chown -R ec2-user:ec2-user /etc/vault",
     ]
 
@@ -72,7 +72,7 @@ resource "aws_instance" "vault" {
 
   provisioner "file" {
     content     = "${data.template_file.vault_config.rendered}"
-    destination = "/etc/vault/conf/vault.hcl"
+    destination = "/etc/vault/config/vault.hcl"
 
     connection {
       type        = "ssh"
@@ -89,7 +89,7 @@ resource "aws_instance" "vault" {
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo docker run --cap-add=IPC_LOCK -d --name vault --network host -v /etc/vault/conf/:/vault/config -e 'AWS_DEFAULT_REGION=${data.aws_region.current.name}' vault server",
+      "sudo docker run -d --name vault --cap-add=IPC_LOCK -h ${self.private_dns} -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
     ]
 
     connection {
