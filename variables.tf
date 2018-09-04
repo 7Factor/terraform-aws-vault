@@ -48,7 +48,7 @@ variable utility_accessible_sg {
   description = "Pass in the ID of your access security group here."
 }
 
-variable vault_ssl_policy {
+variable lb_security_policy {
   description = "Vault UI SSL policy to apply to the ELB."
 }
 

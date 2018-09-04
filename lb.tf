@@ -44,7 +44,7 @@ resource "aws_lb_listener" "vault_lb_listener" {
   load_balancer_arn = "${aws_lb.vault_lb.arn}"
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "${var.vault_ssl_policy}"
+  ssl_policy        = "${var.lb_security_policy}"
   certificate_arn   = "${var.vault_cert_arn}"
 
   default_action {
