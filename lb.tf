@@ -52,3 +52,18 @@ resource "aws_lb_listener" "vault_lb_listener" {
     type             = "forward"
   }
 }
+
+resource "aws_lb_listener" "vault_lb_redirect" {
+  load_balancer_arn = "${aws_lb.vault_lb.arn}"
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
