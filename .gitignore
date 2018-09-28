@@ -3,3 +3,6 @@ backend.tf
 keys
 *.tfvars
 .idea
+terraform.tfstate
+terraform.tfstate.backup
+.vscode
