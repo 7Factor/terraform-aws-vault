@@ -15,7 +15,7 @@ See the examples directory for more information on how to deploy this to your ac
 
 ## Prerequisites
 
-First, you need a decent understanding of how to use Terraform. [Hit the docs](https://www.terraform.io/intro/index.html) for that. Then, you should understand the [vault architecture](https://www.vaultproject.io/docs/internals/architecture.html). Once you're good import this module and pass the appropriate variables. Then, plan your run and deploy.
+First, you need a decent understanding of how to use Terraform. [Hit the docs](https://www.terraform.io/intro/index.html) for that. Then, you should understand the [vault architecture](https://www.vaultproject.io/docs/internals/architecture.html). Once you're good import this module and pass the appropriate variables. Then, plan your run and deploy. 
 
 Not much can go wrong here, but [file issues](https://github.com/7Factor/7f-vault/issues) as needed. Be sure to read our [issues guide](https://7factor.github.io/7fpub-ghissues/) before hand. PRs are welcome.
 
