@@ -26,10 +26,10 @@ resource "aws_lb_target_group" "vault_lb_target" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 3
-    path                = "/ui"
+    timeout             = 5
+    path                = "/v1/sys/health"
     port                = 8200
-    interval            = 30
+    interval            = 15
   }
 }
 
