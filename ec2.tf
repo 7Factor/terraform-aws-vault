@@ -52,7 +52,7 @@ resource "aws_instance" "vault" {
   ]
 
   tags {
-    Name    = "Vault Server"
+    Name    = "Vault Server ${count.index + 1}"
     Cluster = "${var.cluster_name}"
   }
 

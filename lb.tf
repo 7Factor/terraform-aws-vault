@@ -26,10 +26,10 @@ resource "aws_lb_target_group" "vault_lb_target" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 3
-    path                = "/ui"
+    timeout             = 5
+    path                = "/v1/sys/health"
     port                = 8200
-    interval            = 30
+    interval            = 15
   }
 }
 
@@ -60,9 +60,10 @@ resource "aws_lb_listener" "vault_lb_redirect" {
 
   default_action {
     type = "redirect"
+
     redirect {
-      port = "443"
-      protocol = "HTTPS"
+      port        = "443"
+      protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
   }
