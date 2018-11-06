@@ -20,6 +20,7 @@ ha_storage "dynamodb" {
 }
 
 storage "s3" {
+  region     = "$${region}"
   bucket     = "$${vault_data_bucket}"
 }
 
@@ -29,6 +30,7 @@ max_lease_ttl = "720h"
 EOF
 
   vars {
+    region            = "${var.vault_data_bucket_region}"
     vault_data_bucket = "${var.vault_data_bucket}"
   }
 }

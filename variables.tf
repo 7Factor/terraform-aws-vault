@@ -52,6 +52,11 @@ variable lb_security_policy {
   description = "Vault UI SSL policy to apply to the ELB."
 }
 
+variable "vault_data_bucket_region" {
+  default     = "us-east-1"
+  description = "The region your vault data bucket is in. Defaults to us-east-1"
+}
+
 variable vault_data_bucket {
   description = "The bucket name to store encrypted vault information."
 }
