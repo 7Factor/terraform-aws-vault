@@ -19,6 +19,58 @@ First, you need a decent understanding of how to use Terraform. [Hit the docs](h
 
 Not much can go wrong here, but [file issues](https://github.com/7Factor/7f-vault/issues) as needed. Be sure to read our [issues guide](https://7factor.github.io/7fpub-ghissues/) before hand. PRs are welcome.
 
+## Vault AppRoles
+
+To allow Vault access for machines and services an AppRole is required. To do this you must first generate a secret_id and a role_id. This four step process will use your Initial Root Token to generate both of these IDs. Once generated, the IDs must then be used in your setup process to allow your machines/services to access Vault.
+
+For eaxmple: we pass this to our Concourse cred_store_var 
+
+1. Enable the AppRole auth method:
+```sh
+$ curl \
+    --header "X-Vault-Token: <YOUR_INITIAL_ROOT_TOKEN_HERE>" \
+    --request POST \
+    --data '{"type": "approle"}' \
+    https://<YOUR_URL_HERE>/v1/sys/auth/approle
+```
+2. Create an AppRole with desired set of policies:
+```sh
+$ curl \
+    --header "X-Vault-Token: <YOUR_INITIAL_ROOT_TOKEN_HERE>" \
+    --request POST \
+    --data '{"policies": "default"}' \
+    https://<YOUR_URL_HERE>/v1/auth/approle/role/my-role
+```
+3. Fetch the identifier of the role:
+```sh
+$ curl \
+    --header "X-Vault-Token: <YOUR_INITIAL_ROOT_TOKEN_HERE>" \
+    https://<YOUR_URL_HERE>/v1/auth/approle/role/my-role/role-id
+```
+The response will look like:
+```sh
+{
+  "data": {
+    "role_id": "988a9dfd-ea69-4a53-6cb6-9d6b86474bba"
+  }
+}
+```
+4. Create a new secret identifier under the role:
+```sh
+$ curl \
+    --header "X-Vault-Token: <YOUR_INITIAL_ROOT_TOKEN_HERE>" \
+    --request POST \
+     https://<YOUR_URL_HERE>/v1/auth/approle/role/my-role/secret-id
+```
+The response will look like:
+```sh
+{
+  "data": {
+    "secret_id_accessor": "45946873-1d96-a9d4-678c-9229f74386a5",
+    "secret_id": "37b74931-c4cd-d49a-9246-ccc62d682a25"
+  }
+}
+```
 ## Architecture
 
 ![architecture](https://raw.githubusercontent.com/7Factor/7f-vault/dev/docs/vault.png)
