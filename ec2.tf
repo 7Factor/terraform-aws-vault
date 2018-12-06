@@ -47,6 +47,7 @@ resource "aws_instance" "vault" {
 
   key_name             = "${var.vault_ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
+  disable_api_termination = true
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_sg.id}",
@@ -87,7 +88,7 @@ resource "aws_instance" "vault" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y update",
-      "sudo yum -y install docker",
+      "sudo amazon-linux-extras install -y docker",
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
