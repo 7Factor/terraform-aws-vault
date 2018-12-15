@@ -39,7 +39,7 @@ resource "aws_instance" "vault" {
   provisioner "file" {
     content = <<EOF
 ui = true
-api_addr = "https://${var.vault_fqdn}:8200"
+api_addr = "https://${var.vault_fqdn}"
 cluster_addr = "https://${self.private_ip}:8201"
 
 listener "tcp" {
