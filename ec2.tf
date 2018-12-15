@@ -1,38 +1,16 @@
 data "template_file" "vault_config" {
-  template = <<EOF
-ui = true
-api_addr = "https://0.0.0.0:8200"
-cluster_addr = "https://0.0.0.0:8201"
-
-listener "tcp" {
-  address = "0.0.0.0:8200"
-  tls_disable = "true"
-}
-
-listener "tcp" {
-  address = "0.0.0.0:8201"
-  tls_disable = "true"
-}
-
-ha_storage "dynamodb" {
-  ha_enabled = "true"
-  table      = "Vault"
-}
-
-storage "s3" {
-  region     = "$${region}"
-  bucket     = "$${vault_data_bucket}"
-}
-
-default_lease_ttl = "168h"
-max_lease_ttl = "720h"
-
-EOF
+  template = "${file("templates/vault.hcl")}}"
 
   vars {
     region            = "${var.vault_data_bucket_region}"
     vault_data_bucket = "${var.vault_data_bucket}"
+    private_ip        = "${aws_instance.vault.private_ip}"
+    vault_fqdn        = "${var.vault_fqdn}"
   }
+}
+
+output "vault_rendered_config" {
+  value = "${data.template_file.vault_config.rendered}}"
 }
 
 resource "aws_instance" "vault" {
@@ -45,8 +23,8 @@ resource "aws_instance" "vault" {
   # across the configured subnets.
   subnet_id = "${var.private_subnets[count.index % length(var.private_subnets)]}"
 
-  key_name             = "${var.vault_ssh_key_name}"
-  iam_instance_profile = "${aws_iam_instance_profile.vault_instance_profile.name}"
+  key_name                = "${var.vault_ssh_key_name}"
+  iam_instance_profile    = "${aws_iam_instance_profile.vault_instance_profile.name}"
   disable_api_termination = true
 
   vpc_security_group_ids = [
@@ -92,7 +70,7 @@ resource "aws_instance" "vault" {
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --cap-add=IPC_LOCK -h ${self.private_dns} -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
+      "sudo docker run -d --name vault --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
     ]
 
     connection {

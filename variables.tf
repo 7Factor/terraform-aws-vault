@@ -65,3 +65,7 @@ variable "vault_data_bucket_region" {
 variable vault_data_bucket {
   description = "The bucket name to store encrypted vault information."
 }
+
+variable vault_fqdn {
+  default = "vault.7fdev.io"
+}
