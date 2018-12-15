@@ -43,7 +43,7 @@ api_addr = "https://${var.vault_fqdn}"
 cluster_addr = "https://${self.private_ip}:8201"
 
 listener "tcp" {
-  address = "${self.private_ip}:8200"
+  address = "0.0.0.0:8200"
 }
 
 ha_storage "dynamodb" {
