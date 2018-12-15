@@ -52,7 +52,7 @@ ha_storage "dynamodb" {
 }
 
 storage "s3" {
-  region     = "${data.aws_region}"
+  region     = "${data.aws_region.current}"
   bucket     = "${var.vault_data_bucket}"
 }
 
