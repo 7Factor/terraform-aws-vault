@@ -1,18 +1,3 @@
-data "template_file" "vault_config" {
-  template = "${file("templates/vault.hcl")}}"
-
-  vars {
-    region            = "${var.vault_data_bucket_region}"
-    vault_data_bucket = "${var.vault_data_bucket}"
-    private_ip        = "${aws_instance.vault.private_ip}"
-    vault_fqdn        = "${var.vault_fqdn}"
-  }
-}
-
-output "vault_rendered_config" {
-  value = "${data.template_file.vault_config.rendered}}"
-}
-
 resource "aws_instance" "vault" {
   count = "${var.vault_count}"
 
@@ -52,7 +37,30 @@ resource "aws_instance" "vault" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.vault_config.rendered}"
+    content = <<EOF
+ui = true
+api_addr = "https://${var.vault_fqdn}:8200"
+cluster_addr = "https://${self.private_ip}:8201"
+
+listener "tcp" {
+  address = "${self.private_ip}:8200"
+}
+
+ha_storage "dynamodb" {
+  ha_enabled = "true"
+  table      = "Vault"
+}
+
+storage "s3" {
+  region     = "${data.aws_region}"
+  bucket     = "${var.vault_data_bucket}"
+}
+
+default_lease_ttl = "168h"
+max_lease_ttl = "720h"
+
+EOF
+
     destination = "/etc/vault/config/vault.hcl"
 
     connection {
