@@ -10,7 +10,7 @@ resource "aws_instance" "vault" {
 
   key_name                = "${var.vault_ssh_key_name}"
   iam_instance_profile    = "${aws_iam_instance_profile.vault_instance_profile.name}"
-  disable_api_termination = true
+  disable_api_termination = false
 
   vpc_security_group_ids = [
     "${aws_security_group.vault_sg.id}",
