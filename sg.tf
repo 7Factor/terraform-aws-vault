@@ -24,7 +24,7 @@ resource "aws_security_group" "vault_sg" {
   }
 }
 
-resource "aws_security_group_rule" "vault_peer_communication" {
+resource "aws_security_group_rule" "vault_cluster_communication" {
   type                     = "ingress"
   from_port                = 8201
   to_port                  = 8201
