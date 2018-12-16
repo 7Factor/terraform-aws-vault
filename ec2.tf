@@ -74,7 +74,7 @@ EOF
   }
 
   provisioner "file" {
-    source      = "${var.tls_keys_dir}}"
+    source      = "${var.tls_keys_dir}"
     destination = "/etc/vault/keys/"
 
     connection {
