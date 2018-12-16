@@ -76,6 +76,13 @@ EOF
   provisioner "file" {
     source      = "${var.tls_keys_dir}}"
     destination = "/etc/vault/keys/"
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = "${self.private_ip}"
+      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+    }
   }
 
   provisioner "remote-exec" {
