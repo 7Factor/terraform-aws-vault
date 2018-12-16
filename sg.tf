@@ -54,6 +54,13 @@ resource "aws_security_group" "vault_httplb_sg" {
     cidr_blocks = ["${var.vault_ingress_cidr}"]
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.vault_ingress_cidr}"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
