@@ -39,23 +39,17 @@ resource "aws_instance" "vault" {
   provisioner "file" {
     content = <<EOF
 ui = true
-api_addr = "https://${var.vault_fqdn}"
-cluster_addr = "http://${self.private_ip}:8201"
+disable_clustering = true
 
 listener "tcp" {
   address = "${self.private_ip}:8200"
-  cluster_addr = "http://${self.private_ip}:8201"
-  tls_disable = "true"
+  tls_disable = true
 }
 
 ha_storage "dynamodb" {
   ha_enabled = "true"
-  table      = "Vault"
-}
-
-storage "s3" {
   region     = "${data.aws_region.current.name}"
-  bucket     = "${var.vault_data_bucket}"
+  table      = "vault-dynamodb-backend"
 }
 
 default_lease_ttl = "168h"
