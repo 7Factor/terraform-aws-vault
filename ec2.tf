@@ -44,6 +44,7 @@ cluster_addr = "http://${self.private_ip}:8201"
 
 listener "tcp" {
   address = "${self.private_ip}:8200"
+  cluster_addr = "http://${self.private_ip}:8201"
   tls_disable = "true"
 }
 
