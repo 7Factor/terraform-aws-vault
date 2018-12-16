@@ -69,3 +69,7 @@ variable vault_data_bucket {
 variable vault_fqdn {
   default = "vault.7fdev.io"
 }
+
+variable tls_keys_dir {
+  description = "Directory for TLS keys used for inter vault communication."
+}
