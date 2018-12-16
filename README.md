@@ -11,7 +11,21 @@ See the examples directory for more information on how to deploy this to your ac
 
 ## Prerequisites
 
-First, you need a decent understanding of how to use Terraform. [Hit the docs](https://www.terraform.io/intro/index.html) for that. Then, you should understand the [vault architecture](https://www.vaultproject.io/docs/internals/architecture.html). Once you're good import this module and pass the appropriate variables. Then, plan your run and deploy. 
+First, you need a decent understanding of how to use Terraform. [Hit the docs](https://www.terraform.io/intro/index.html) for that. Then, you should understand the [vault architecture](https://www.vaultproject.io/docs/internals/architecture.html). Once you're good import this module and pass the appropriate variables. Then, plan your run and deploy.
+
+## Vault HA Architecture
+
+Vault is irritating to work with when placed in a cluster, but this is more or less by design. Vault utilizes a hot-standby approach and doesn't scale horizontally through new nodes. So, any time you build out a vault cluster you need to understand that you'll be performing the following steps by *hand* every time. We recommend only ever creating a single standby node. That's more or less all you'll need.
+
+When vault starts up behind the load balancer the health check will report that all nodes are unhealthy by default. The `sys/health` API returns a 503 when the node is in an uninitialized state. To allow users to initialize the vault cluster via the ui we modify the health check to return a 200 when vault is in this state (see the health check for the vault target group in `lb.tf` for more details).
+
+First, you must initialize a vault cluster. To do so log into a machine with the vault client installed and run `vault operator init` with the appropriate values selected, or you can hit the load balancer provisioned through this terraform and initialize it via the UI. The master key will be written to the backend storage and propagated to all other nodes, so you don't need to perform that operation more than once.
+
+Next is unsealing--which is the irritating part. You must unseal *every node* in your cluster distinctly. We *do not* recommend attempting to do this via the load balancer because it will be very painful. Instead, hit the private IP address of each node and unseal it via the UI or run the appropriate `unseal` command on the CLI for every node.
+
+### Failing over
+
+Hopefully in the future vault will have some more interesting ways to manage this problem, but currently the way we fail over is via health checks on the target groups. The [api documentation](https://www.vaultproject.io/api/system/health.html) for the health check API is very good, and to understand the solution you should read the documentation and note that through query string parameters we can control how the health check API responds to specific vault states.
 
 ## Vault AppRoles
 
