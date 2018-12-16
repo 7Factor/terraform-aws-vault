@@ -75,7 +75,7 @@ EOF
 
   provisioner "file" {
     source      = "${var.tls_keys_dir}"
-    destination = "/etc/vault/keys"
+    destination = "/etc/vault/keys/"
 
     connection {
       type        = "ssh"
