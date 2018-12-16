@@ -17,17 +17,17 @@ First, you need a decent understanding of how to use Terraform. [Hit the docs](h
 
 The [api documentation](https://www.vaultproject.io/api/system/health.html) for the health check API is required reading to understand the solutions outlined in this section. We use the query strings provided in the reference control how the health check API responds to specific vault states.
 
-Vault is irritating to work with when placed in a cluster, but this is more or less by design. Vault utilizes a hot-standby approach and doesn't scale horizontally through new nodes. So, any time you build out a vault cluster you need to understand that you'll be performing the following steps by *hand* every time. We recommend only ever creating a single standby node. That's more or less all you'll need.
+Vault utilizes a hot-standby approach and doesn't scale horizontally through new nodes. So, any time you build out a vault cluster you need to understand that you'll be performing the following steps by *hand* every time. We recommend only ever creating a single standby node. That's more or less all you'll need.
 
-When vault starts up behind the load balancer the health check will report that all nodes are unhealthy by default. The `sys/health` API returns a 503 when the node is in an uninitialized state. To allow users to initialize the vault cluster via the ui we modify the health check to return a 200 when vault is in this state (see the health check for the vault target group in `lb.tf` for more details). This is a convenience only.
+When vault starts up behind the load balancer the health check will report that all nodes are unhealthy by default. The `sys/health` API returns a 503 when the node is in an uninitialized state. To allow users to initialize the vault cluster via the ui we have modified the health check to return a 200 when vault is in this state (see the health check for the vault target group in `lb.tf` for more details).
 
 To initialize vault in a minty fresh install either log into a machine with the vault client installed and run `vault operator init` with your desired values, or you hit the load balancer provisioned through this terraform and initialize it via the UI. The master key will be written to the backend storage and propagated to all other nodes, so you don't need to perform that operation more than once.
 
-After initialization is unsealing--which is a little more time consuming part. You must unseal *every node* in your cluster distinctly, and after initialization the vault health check will begin returning a 501 to the load balancer. We *do not* recommend attempting to do this via the load balancer because it will be very painful. Instead, hit the private IP address of each node and unseal it via the UI or run the appropriate `unseal` command on the CLI for every node.
+After initialization is unsealing--which is a little more time consuming depending on how many nodes you have. You must unseal *every node* in your cluster distinctly or during a failover you might just find that your new node is sealed and no clients are able to interact with it. After initialization the vault health check will begin returning a 501 to the load balancer for any nodes that are currently sealed. We *do not* recommend attempting to do this via the load balancer because it will be very painful. Instead, hit the private IP address of each node and unseal it via the UI or run the appropriate `unseal` command on the CLI for every node. Once you've done that a shiny new vault 1.0 feature will ensure seamless fail-overs: auto-unsealing via a KMS.
 
-### Failing over
+### Auto-unseal
 
-
+As of Vault 1.0 we can now use Amazon KMS (and other key management systems) to allow a vault instance to automagically unseal itself if it's bounced. We have integrated this into the terraform so that a key is created with the appropriate credentials. This includes if you lose a node and re-terraform a new one.
 
 ## Vault AppRoles
 

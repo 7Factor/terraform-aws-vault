@@ -27,10 +27,10 @@ resource "aws_lb_target_group" "vault_lb_target" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 5
+    timeout             = 2
     path                = "/v1/sys/health?uninitcode=200"
     port                = 8200
-    interval            = 15
+    interval            = 5
   }
 }
 
