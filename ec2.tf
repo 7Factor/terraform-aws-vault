@@ -1,5 +1,5 @@
-resource "aws_instance" "vault_standby" {
-  count = "${var.vault_standby_count + 1}"
+resource "aws_instance" "vault" {
+  count = "${var.vault_standby_count}"
 
   ami           = "${data.aws_ami.aws_linux.id}"
   instance_type = "${var.vault_instance_type}"
