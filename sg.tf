@@ -33,6 +33,15 @@ resource "aws_security_group_rule" "vault_peer_communication" {
   security_group_id        = "${aws_security_group.vault_sg.id}"
 }
 
+resource "aws_security_group_rule" "vault_peer_communication" {
+  type                     = "ingress"
+  from_port                = 8200
+  to_port                  = 8200
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.vault_sg.id}"
+  security_group_id        = "${aws_security_group.vault_sg.id}"
+}
+
 resource "aws_security_group" "vault_httplb_sg" {
   name        = "vault-lb-sg-${data.aws_region.current.name}"
   description = "Security group for the LB in ${data.aws_region.current.name}."
