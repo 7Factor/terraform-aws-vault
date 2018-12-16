@@ -46,7 +46,7 @@ listener "tcp" {
   tls_disable = true
 }
 
-ha_storage "dynamodb" {
+storage "dynamodb" {
   ha_enabled = "true"
   region     = "${data.aws_region.current.name}"
   table      = "vault-dynamodb-backend"
