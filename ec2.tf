@@ -43,7 +43,7 @@ api_addr = "https://${var.vault_fqdn}"
 cluster_addr = "https://${self.private_ip}:8201"
 
 listener "tcp" {
-  address = "0.0.0.0:8200"
+  address = "${self.private_ip}:8200"
   tls_cert_file = "/vault/keys/vault.crt"
   tls_key_file = "/vault/keys/vault.key"
 }
@@ -92,7 +92,7 @@ EOF
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --cap-add=IPC_LOCK -p ${self.private_ip}:8200:8200 -p ${self.private_ip}:8201:8201 -v /etc/vault/config/:/vault/config -v /etc/vault/keys:/vault/keys vault server",
+      "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p ${self.private_ip}:8200:8200 -p ${self.private_ip}:8201:8201 -v /etc/vault/config/:/vault/config -v /etc/vault/keys:/vault/keys vault server",
     ]
 
     connection {
