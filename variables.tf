@@ -24,7 +24,7 @@ variable vault_instance_type {
   description = "The ui instance type. Usually around an m3.large gets it done, but do what you want."
 }
 
-variable vault_count {
+variable vault_standby_count {
   default     = 2
   description = "The number of vault boxes to run. Defaults to a pair."
 }

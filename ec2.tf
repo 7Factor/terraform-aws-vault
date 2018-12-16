@@ -1,5 +1,5 @@
-resource "aws_instance" "vault" {
-  count = "${var.vault_count}"
+resource "aws_instance" "vault_standby" {
+  count = "${var.vault_standby_count + 1}"
 
   ami           = "${data.aws_ami.aws_linux.id}"
   instance_type = "${var.vault_instance_type}"
@@ -39,18 +39,27 @@ resource "aws_instance" "vault" {
   provisioner "file" {
     content = <<EOF
 ui = true
-disable_clustering = true
 api_addr = "https://${var.vault_fqdn}"
 
 listener "tcp" {
   address = "${self.private_ip}:8200"
-  tls_disable = true
+  tls_disable = "true"
 }
 
-storage "dynamodb" {
+ha_storage "dynamodb" {
   ha_enabled = "true"
   region     = "${data.aws_region.current.name}"
-  table      = "vault-dynamodb-backend"
+  table      = "vault-lock"
+}
+
+storage "s3" {
+  region     = "${data.aws_region.current.name}"
+  bucket     = "${var.vault_data_bucket}"
+}
+
+seal "awskms" {
+  region     = "${data.aws_region.current.name}"
+  kms_key_id = "c5b9e50e-9894-4171-937c-0387770e2db8"
 }
 
 default_lease_ttl = "168h"
