@@ -40,6 +40,7 @@ resource "aws_instance" "vault" {
     content = <<EOF
 ui = true
 disable_clustering = true
+api_addr = "https://${var.vault_fqdn}"
 
 listener "tcp" {
   address = "${self.private_ip}:8200"
