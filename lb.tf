@@ -19,7 +19,7 @@ resource "aws_lb" "vault_lb" {
 }
 
 resource "aws_lb_target_group" "vault_lb_target" {
-  name     = "vault-lb-${data.aws_region.current.name}-target"
+  name     = "vault-targets"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "vault_lb_target" {
 }
 
 resource "aws_lb_target_group_attachment" "vault_lb_target_attachments" {
-  count            = "${var.vault_standby_count}"
+  count            = "${var.vault_count}"
   target_group_arn = "${aws_lb_target_group.vault_lb_target.arn}"
   target_id        = "${element(aws_instance.vault.*.id, count.index)}"
   port             = 8200
