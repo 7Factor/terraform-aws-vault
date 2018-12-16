@@ -29,6 +29,8 @@ After initialization is unsealing--which is a little more time consuming dependi
 
 As of Vault 1.0 we can now use Amazon KMS (and other key management systems) to allow a vault instance to automagically unseal itself if it's bounced. We have integrated this into the terraform so that a key is created with the appropriate credentials. This includes if you lose a node and re-terraform a new one--everything tends to wake up and continue to operate unsealed.
 
+Auto-unsealing requires that the vault instance be a member of the `VaultEC2` IAM role.
+
 ### Time to failover
 
 In general it takes around 5 seconds for Vault to fail over to a standby node when a primary is whacked. This is because the lowest possible value for LB health checks is 5 seconds. This could likely be improved with other architectures, but it works well for now. After a primary is destroyed the next time the load balancer health checks the stand by it will come online--but note there can be down time and clients/pipelines should be aware of this.
