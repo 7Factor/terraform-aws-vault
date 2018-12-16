@@ -92,7 +92,7 @@ EOF
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p ${self.private_ip}:8200:8200 -p ${self.private_ip}:8201:8201 -v /etc/vault/config/:/vault/config -v /etc/vault/keys:/vault/keys vault server",
+      "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config -v /etc/vault/keys:/vault/keys vault server",
     ]
 
     connection {
