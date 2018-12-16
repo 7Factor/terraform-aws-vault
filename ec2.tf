@@ -44,8 +44,7 @@ cluster_addr = "https://${self.private_ip}:8201"
 
 listener "tcp" {
   address = "${self.private_ip}:8200"
-  tls_cert_file = "/vault/keys/vault.crt"
-  tls_key_file = "/vault/keys/vault.key"
+  tls_disable = "true"
 }
 
 ha_storage "dynamodb" {
@@ -73,18 +72,6 @@ EOF
     }
   }
 
-  provisioner "file" {
-    source      = "${var.tls_keys_dir}"
-    destination = "/etc/vault/keys/"
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      host        = "${self.private_ip}"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
-    }
-  }
-
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y update",
@@ -92,7 +79,7 @@ EOF
       "sudo service docker start",
       "sudo usermod -aG docker ec2-user",
       "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config -v /etc/vault/keys:/vault/keys vault server",
+      "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
     ]
 
     connection {
