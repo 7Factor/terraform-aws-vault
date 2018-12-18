@@ -67,5 +67,5 @@ variable vault_data_bucket {
 }
 
 variable vault_fqdn {
-  default = "vault.7fdev.io"
+  description = "The fully qualified domain name for vault leader nodes"
 }
