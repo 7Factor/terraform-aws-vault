@@ -59,7 +59,7 @@ storage "s3" {
 
 seal "awskms" {
   region     = "${data.aws_region.current.name}"
-  kms_key_id = "c5b9e50e-9894-4171-937c-0387770e2db8"
+  kms_key_id = "${aws_kms_key.vault_autounseal.key_id}"
 }
 
 default_lease_ttl = "168h"
