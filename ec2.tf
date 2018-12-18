@@ -153,15 +153,11 @@ resource "aws_iam_policy" "vault_policy" {
         "dynamodb:Query",
         "dynamodb:UpdateItem",
         "dynamodb:Scan",
-        "dynamodb:DescribeTable"
+        "dynamodb:DescribeTable",
+        "s3:*"
       ],
       "Resource": "*"
     },
-    {
-      "Effect": "Allow",
-      "Action": "s3:*",
-      "Resource": "*"
-    }
   ]
 }
 EOF
