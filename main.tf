@@ -24,3 +24,6 @@ data "aws_ami" "aws_linux" {
     values = ["amazon"]
   }
 }
+
+# grab the caller identity to use the account_id
+data "aws_caller_identity" "current" {}
