@@ -157,7 +157,7 @@ resource "aws_iam_policy" "vault_policy" {
         "s3:*"
       ],
       "Resource": "*"
-    },
+    }
   ]
 }
 EOF
