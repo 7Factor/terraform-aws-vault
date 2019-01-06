@@ -8,7 +8,7 @@ resource "aws_instance" "vault" {
   # across the configured subnets.
   subnet_id = "${var.private_subnets[count.index % length(var.private_subnets)]}"
 
-  key_name                = "${var.vault_ssh_key_name}"
+  key_name                = "${var.vault_key_name}"
   iam_instance_profile    = "${aws_iam_instance_profile.vault_instance_profile.name}"
   disable_api_termination = false
 
