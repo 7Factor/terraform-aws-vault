@@ -1,8 +1,3 @@
-variable internal {
-  default     = false
-  description = "Whether or not the vault load balancer is internal or not"
-}
-
 variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }
@@ -29,32 +24,13 @@ variable vault_count {
   description = "The number of vault boxes to run. Defaults to a pair."
 }
 
-variable public_subnets {
-  type        = "list"
-  description = "The public subnet ID corresponding to the private subnet you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
-}
-
-variable private_subnets {
-  type        = "list"
-  description = "The private subnet ID you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
-}
-
 variable vault_cert_arn {
   description = "The ARN to the SSL cert we'll apply to the ELB."
 }
 
-# security group variables
 variable vault_ingress_cidr {
   default     = "0.0.0.0/0"
   description = "The CIDR block from whence web traffic may come. Defaults to anywhere, but override it as necessary. This is applied to the ELB."
-}
-
-variable utility_accessible_sg {
-  description = "Pass in the ID of your access security group here."
-}
-
-variable lb_security_policy {
-  description = "Vault UI SSL policy to apply to the ELB."
 }
 
 variable "vault_data_bucket_region" {
@@ -68,4 +44,27 @@ variable vault_data_bucket {
 
 variable vault_fqdn {
   description = "The fully qualified domain name for vault leader nodes"
+}
+
+variable utility_accessible_sg {
+  description = "Pass in the ID of your access security group here."
+}
+
+variable lb_security_policy {
+  description = "Vault UI SSL policy to apply to the ELB."
+}
+
+variable lb_internal {
+  default     = false
+  description = "Whether or not the vault load balancer is internal or not."
+}
+
+variable public_subnets {
+  type        = "list"
+  description = "The public subnet ID corresponding to the private subnet you'll be installing vault ui into. These are assigned to the load balancer."
+}
+
+variable private_subnets {
+  type        = "list"
+  description = "The private subnet ID you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
 }

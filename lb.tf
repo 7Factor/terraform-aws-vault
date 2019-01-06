@@ -2,7 +2,7 @@
 resource "aws_lb" "vault_lb" {
   name               = "vault-lb-${data.aws_region.current.name}"
   load_balancer_type = "application"
-  internal           = "${var.internal}"
+  internal           = "${var.lb_internal}"
 
   subnets = [
     "${var.public_subnets}",
