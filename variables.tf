@@ -43,7 +43,7 @@ variable vault_data_bucket {
 }
 
 variable vault_fqdn {
-  description = "The fully qualified domain name for vault leader nodes"
+  description = "The fully qualified domain name for vault leader nodes without the protocol. We will force HTTPS."
 }
 
 variable utility_accessible_sg {

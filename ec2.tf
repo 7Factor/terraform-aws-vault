@@ -86,8 +86,9 @@ EOF
       "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
       "sudo apt-get update",
       "sudo apt-get install -y docker-ce",
-      "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
+      "sudo usermod -aG docker ubuntu",
+      "docker pull ${var.vault_image}",
+      "docker run -d --name vault --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
     ]
 
     connection {
