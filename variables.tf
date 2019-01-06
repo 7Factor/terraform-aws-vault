@@ -7,6 +7,10 @@ variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }
 
+variable vault_key_path {
+  description = "A folder, usually relative to root of the TF you're running, where the vault key is stored."
+}
+
 variable vault_ssh_key_name {
   description = "The PEM key name for accessing and provisioning stuff."
 }
