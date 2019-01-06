@@ -24,12 +24,12 @@ resource "aws_instance" "vault" {
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /etc/vault/config",
-      "sudo chown -R ec2-user:ec2-user /etc/vault",
+      "sudo chown -R ubuntu:ubuntu /etc/vault",
     ]
 
     connection {
       type        = "ssh"
-      user        = "ec2-user"
+      user        = "ubuntu"
       host        = "${self.private_ip}"
       private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
@@ -70,7 +70,7 @@ EOF
 
     connection {
       type        = "ssh"
-      user        = "ec2-user"
+      user        = "ubuntu"
       host        = "${self.private_ip}"
       private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
@@ -92,7 +92,7 @@ EOF
 
     connection {
       type        = "ssh"
-      user        = "ec2-user"
+      user        = "ubuntu"
       host        = "${self.private_ip}"
       private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
