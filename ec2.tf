@@ -31,7 +31,7 @@ resource "aws_instance" "vault" {
       type        = "ssh"
       user        = "ec2-user"
       host        = "${self.private_ip}"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
   }
 
@@ -72,7 +72,7 @@ EOF
       type        = "ssh"
       user        = "ec2-user"
       host        = "${self.private_ip}"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
   }
 
@@ -90,7 +90,7 @@ EOF
       type        = "ssh"
       user        = "ec2-user"
       host        = "${self.private_ip}"
-      private_key = "${file("${path.root}/keys/${var.vault_ssh_key_name}.pem")}"
+      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
     }
   }
 }
