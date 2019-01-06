@@ -3,10 +3,6 @@ variable internal {
   description = "Whether or not the vault load balancer is internal or not"
 }
 
-variable cluster_name {
-  description = "Name your cluster! This will show up in tags."
-}
-
 variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }

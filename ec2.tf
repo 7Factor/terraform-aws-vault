@@ -18,8 +18,7 @@ resource "aws_instance" "vault" {
   ]
 
   tags {
-    Name    = "Vault Server ${count.index + 1}"
-    Cluster = "${var.cluster_name}"
+    Name = "Vault Server ${count.index + 1}"
   }
 
   provisioner "remote-exec" {

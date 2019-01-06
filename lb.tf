@@ -13,8 +13,7 @@ resource "aws_lb" "vault_lb" {
   ]
 
   tags {
-    Name    = "Vault LB"
-    Cluster = "${var.cluster_name}"
+    Name = "Vault LB"
   }
 }
 
