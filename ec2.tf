@@ -1,7 +1,7 @@
 resource "aws_instance" "vault" {
   count = "${var.vault_count}"
 
-  ami           = "${data.aws_ami.aws_linux.id}"
+  ami           = "${data.aws_ami.base_ami.id}"
   instance_type = "${var.vault_instance_type}"
 
   # We're doing some magic here to allow for any number of count that's evenly distributed
@@ -78,10 +78,14 @@ EOF
 
   provisioner "remote-exec" {
     inline = [
-      "sudo yum -y update",
-      "sudo amazon-linux-extras install -y docker",
-      "sudo service docker start",
-      "sudo usermod -aG docker ec2-user",
+      "sudo apt-get update",
+      "sudo unattended-upgrade -d",
+      "sudo apt-get remove docker docker-engine docker.io",
+      "sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
+      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+      "sudo apt-get update",
+      "sudo apt-get install -y docker-ce",
       "sudo docker pull ${var.vault_image}",
       "sudo docker run -d --name vault --net=host --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
     ]
