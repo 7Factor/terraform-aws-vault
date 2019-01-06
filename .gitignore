@@ -1,8 +1,16 @@
+# Terraform state
 .terraform
-backend.tf
-keys
-*.tfvars
-.idea
 terraform.tfstate
 terraform.tfstate.backup
+
+# Secrets and whatnot
+keys/
+secrets.tfvars
+backend.tf
+
+# IDE nonsense
+.idea
 .vscode
+
+.DS_Store
+Thumbs.db
