@@ -1,6 +1,6 @@
 # Required terraform version
 terraform {
-  required_version = ">=0.10.7"
+  required_version = ">=0.12.3"
 }
 
 # Grab the current region to be used everywhere
