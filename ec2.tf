@@ -1,20 +1,20 @@
 resource "aws_instance" "vault" {
-  count = "${var.vault_count}"
+  count = var.vault_count
 
-  ami           = "${data.aws_ami.base_ami.id}"
-  instance_type = "${var.vault_instance_type}"
+  ami           = data.aws_ami.base_ami.id
+  instance_type = var.vault_instance_type
 
   # We're doing some magic here to allow for any number of count that's evenly distributed
   # across the configured subnets.
-  subnet_id = "${var.private_subnets[count.index % length(var.private_subnets)]}"
+  subnet_id = var.private_subnets[count.index % length(var.private_subnets)]
 
-  key_name                = "${var.vault_key_name}"
-  iam_instance_profile    = "${aws_iam_instance_profile.vault_instance_profile.name}"
+  key_name                = var.vault_key_name
+  iam_instance_profile    = aws_iam_instance_profile.vault_instance_profile.name
   disable_api_termination = false
 
   vpc_security_group_ids = [
-    "${aws_security_group.vault_sg.id}",
-    "${var.utility_accessible_sg}",
+    aws_security_group.vault_sg.id,
+    var.utility_accessible_sg,
   ]
 
   tags = {
@@ -30,8 +30,8 @@ resource "aws_instance" "vault" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      host        = "${self.private_ip}"
-      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
+      host        = self.private_ip
+      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
     }
   }
 
@@ -71,8 +71,8 @@ EOF
     connection {
       type = "ssh"
       user = "ubuntu"
-      host = "${self.private_ip}"
-      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
+      host = self.private_ip
+      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
     }
   }
 
@@ -93,20 +93,20 @@ EOF
     connection {
       type = "ssh"
       user = "ubuntu"
-      host = "${self.private_ip}"
-      private_key = "${file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")}"
+      host = self.private_ip
+      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
     }
   }
 }
 
 resource "aws_iam_instance_profile" "vault_instance_profile" {
   name = "vault-ec2-role"
-  role = "${aws_iam_role.vault_role.name}"
+  role = aws_iam_role.vault_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "vault_permissions" {
-  role = "${aws_iam_role.vault_role.name}"
-  policy_arn = "${aws_iam_policy.vault_policy.arn}"
+  role = aws_iam_role.vault_role.name
+  policy_arn = aws_iam_policy.vault_policy.arn
 }
 
 resource "aws_iam_role" "vault_role" {
