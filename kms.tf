@@ -55,6 +55,6 @@ EOF
 }
 
 resource "aws_kms_alias" "vault_autounseal_alias" {
-  name          = "alias/vault-autounseal"
+  name = "alias/vault-autounseal"
   target_key_id = "${aws_kms_key.vault_autounseal.key_id}"
 }
