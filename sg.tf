@@ -18,7 +18,7 @@ resource "aws_security_group" "vault_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "Vault Boxes"
   }
 }
@@ -67,7 +67,7 @@ resource "aws_security_group" "vault_httplb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "Vault Load Balancer"
   }
 }

@@ -17,7 +17,7 @@ resource "aws_instance" "vault" {
     "${var.utility_accessible_sg}",
   ]
 
-  tags {
+  tags = {
     Name = "Vault Server ${count.index + 1}"
   }
 
@@ -142,7 +142,7 @@ resource "aws_iam_policy" "vault_policy" {
       "Action": [
         "dynamodb:DescribeLimits",
         "dynamodb:DescribeTimeToLive",
-        "dynamodb:ListTagsOfResource",
+        "dynamodb:Listtags =OfResource",
         "dynamodb:DescribeReservedCapacityOfferings",
         "dynamodb:DescribeReservedCapacity",
         "dynamodb:ListTables",

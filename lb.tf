@@ -4,15 +4,13 @@ resource "aws_lb" "vault_lb" {
   load_balancer_type = "application"
   internal           = "${var.lb_internal}"
 
-  subnets = [
-    "${var.public_subnets}",
-  ]
+  subnets = flatten(["${var.public_subnets}"])
 
   security_groups = [
     "${aws_security_group.vault_httplb_sg.id}",
   ]
 
-  tags {
+  tags = {
     Name = "Vault LB"
   }
 }
