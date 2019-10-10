@@ -87,3 +87,33 @@ The response will look like:
   }
 }
 ```
+
+You can also enable approles via the webUI using the vaultCLI
+
+
+1. Enable the AppRole auth method:
+```
+vault auth enable approle
+```
+2. Create an AppRole with desired set of policies:
+```vault write auth/approle/role/my-role \
+    secret_id_ttl=10m \
+    token_num_uses=10 \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=40
+```
+3. Fetch the identifier of the role:
+```
+vault read auth/approle/role/my-role/role-id
+```
+The response will look like:
+```role_id     db02de05-fa39-4855-059b-67221c5c2f63
+```
+4. Create a new secret identifier under the role:
+```vault write -force auth/approle/role/my-role/secret-id
+```
+The response will look like:
+```secret_id               6a174c20-f6de-a53c-74d2-6018fcceff64
+secret_id_accessor      c454f7e5-996e-7230-6074-6ef26b7bcf86
+```
