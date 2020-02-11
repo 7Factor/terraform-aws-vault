@@ -39,7 +39,7 @@ In general it takes around 5 seconds for Vault to fail over to a standby node wh
 
 To allow Vault access for machines and services an AppRole is required. To do this you must first generate a `secret_id` and a `role_id`. This four step process will use your Initial Root Token to generate both of these IDs. Once generated, the IDs must then be used in your setup process to allow your machines/services to access Vault.
 
-For eaxmple: we pass this to our Concourse `cred_store_var` to enable integration: 
+For example: we pass this to our Concourse `cred_store_var` to enable integration: 
 
 1. Enable the AppRole auth method:
 ```sh
