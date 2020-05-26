@@ -69,9 +69,9 @@ EOF
     destination = "/etc/vault/config/vault.hcl"
 
     connection {
-      type = "ssh"
-      user = "ubuntu"
-      host = self.private_ip
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
       private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
     }
   }
@@ -91,9 +91,9 @@ EOF
     ]
 
     connection {
-      type = "ssh"
-      user = "ubuntu"
-      host = self.private_ip
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
       private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
     }
   }
@@ -105,12 +105,12 @@ resource "aws_iam_instance_profile" "vault_instance_profile" {
 }
 
 resource "aws_iam_role_policy_attachment" "vault_permissions" {
-  role = aws_iam_role.vault_role.name
+  role       = aws_iam_role.vault_role.name
   policy_arn = aws_iam_policy.vault_policy.arn
 }
 
 resource "aws_iam_role" "vault_role" {
-  name = "VaultEC2"
+  name        = "VaultEC2"
   description = "Houses required permissions for Vault EC2 boxes."
 
   assume_role_policy = <<EOF

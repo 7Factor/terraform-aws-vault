@@ -3,6 +3,10 @@ terraform {
   required_version = ">=0.12.3"
 }
 
+provider "aws" {
+  version = "2.63"
+}
+
 # Grab the current region to be used everywhere
 data "aws_region" "current" {}
 

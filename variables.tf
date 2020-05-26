@@ -60,11 +60,11 @@ variable lb_internal {
 }
 
 variable public_subnets {
-  type        = "list"
+  type        = list(string)
   description = "The public subnet ID corresponding to the private subnet you'll be installing vault ui into. These are assigned to the load balancer."
 }
 
 variable private_subnets {
-  type        = "list"
+  type        = list(string)
   description = "The private subnet ID you'll be installing vault ui into. Again, we make no assumptions. This should be large enough to support your cluster."
 }
