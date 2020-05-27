@@ -1,3 +1,15 @@
+data "template_file" "vault_initialization" {
+  template = file("${path.module}/templates/vault_user_data.sh")
+
+  vars = {
+    region                  = data.aws_region.current.name
+    vault_version           = var.vault_version
+    vault_fqdn              = var.vault_fqdn
+    vault_data_bucket       = var.vault_data_bucket
+    vault_autounseal_key_id = aws_kms_key.vault_autounseal.key_id
+  }
+}
+
 resource "aws_instance" "vault" {
   count = var.vault_count
 
@@ -21,82 +33,7 @@ resource "aws_instance" "vault" {
     Name = "Vault Server ${count.index + 1}"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p /etc/vault/config",
-      "sudo chown -R ubuntu:ubuntu /etc/vault",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      host        = self.private_ip
-      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
-    }
-  }
-
-  provisioner "file" {
-    content = <<EOF
-ui = true
-api_addr = "https://${var.vault_fqdn}"
-
-listener "tcp" {
-  address = "${self.private_ip}:8200"
-  tls_disable = "true"
-}
-
-ha_storage "dynamodb" {
-  ha_enabled = "true"
-  region     = "${data.aws_region.current.name}"
-  table      = "vault-lock"
-}
-
-storage "s3" {
-  region     = "${data.aws_region.current.name}"
-  bucket     = "${var.vault_data_bucket}"
-}
-
-seal "awskms" {
-  region     = "${data.aws_region.current.name}"
-  kms_key_id = "${aws_kms_key.vault_autounseal.key_id}"
-}
-
-default_lease_ttl = "168h"
-max_lease_ttl = "720h"
-
-EOF
-
-    destination = "/etc/vault/config/vault.hcl"
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      host        = self.private_ip
-      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update",
-      "sudo unattended-upgrade -d",
-      "sudo apt-get remove docker docker-engine docker.io",
-      "sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
-      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
-      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
-      "sudo apt-get update",
-      "sudo apt-get install -y docker-ce",
-      "sudo docker pull ${var.vault_image}",
-      "sudo docker run -d --name vault --network host --cap-add=IPC_LOCK -p 8200:8200 -p 8201:8201 -v /etc/vault/config/:/vault/config vault server",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      host        = self.private_ip
-      private_key = file("${path.root}/${var.vault_key_path}/${var.vault_key_name}.pem")
-    }
-  }
+  user_data = base64encode(data.template_file.vault_initialization.rendered)
 }
 
 resource "aws_iam_instance_profile" "vault_instance_profile" {

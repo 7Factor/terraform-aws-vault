@@ -1,8 +1,7 @@
 vpc_id = "vpc-0e6ce80c5861c0584"
 
 vault_key_name      = "vault-us-east-1"
-vault_key_path      = "keys"
-vault_image         = "vault:1.3.1"
+vault_version       = "1.3.1"
 vault_instance_type = "t2.micro"
 vault_cert_arn      = "arn:aws:acm:us-east-1:964357038409:certificate/3318654b-0652-485f-9a4f-3bb9bbbad075"
 vault_fqdn          = "vault.7fdev.io"

@@ -2,16 +2,12 @@ variable vpc_id {
   description = "The ID of the VPC you'll be installing vault into. We make no assumptions about your networking stack, so you should provide this."
 }
 
-variable vault_key_path {
-  description = "A folder, usually relative to root of the TF you're running, where the vault key is stored."
-}
-
 variable vault_key_name {
   description = "The PEM key name for accessing and provisioning stuff."
 }
 
-variable vault_image {
-  default     = "vault"
+variable vault_version {
+  default     = "1.4.2"
   description = "The image name for vault. Defaults to latest, but you should lock this down."
 }
 
