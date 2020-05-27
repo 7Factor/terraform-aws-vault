@@ -10,8 +10,7 @@ vpc_id = "VPC-ID"
 
 # Misc stuff
 vault_key_name      = "VAULT-PEM"
-vault_key_path      = "keys"
-vault_image         = "vault:1.0.1"
+vault_version       = "1.0.1"
 vault_instance_type = "t3.micro"
 vault_cert_arn      = "CERT-ARN"
 vault_fqdn          = "MY-FQDN"

@@ -3,6 +3,15 @@ terraform {
   required_version = ">=0.12.3"
 }
 
+# lock down provider versions
+provider "aws" {
+  version = "2.63"
+}
+
+provider "template" {
+  version = "2.1"
+}
+
 # Grab the current region to be used everywhere
 data "aws_region" "current" {}
 
