@@ -5,7 +5,7 @@ data "template_file" "vault_initialization" {
     region                  = data.aws_region.current.name
     vault_version           = var.vault_version
     vault_fqdn              = var.vault_fqdn
-    vault_data_bucket       = var.vault_data_bucket
+    vault_bucket_name       = var.vault_bucket_name
     vault_autounseal_key_id = aws_kms_key.vault_autounseal.key_id
   }
 }

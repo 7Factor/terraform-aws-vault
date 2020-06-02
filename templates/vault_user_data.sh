@@ -31,7 +31,7 @@ ha_storage "dynamodb" {
 
 storage "s3" {
   region     = "${region}"
-  bucket     = "${vault_data_bucket}"
+  bucket     = "${vault_bucket_name}"
 }
 
 seal "awskms" {

@@ -29,12 +29,7 @@ variable vault_ingress_cidr {
   description = "The CIDR block from whence web traffic may come. Defaults to anywhere, but override it as necessary. This is applied to the ELB."
 }
 
-variable "vault_data_bucket_region" {
-  default     = "us-east-1"
-  description = "The region your vault data bucket is in. Defaults to us-east-1"
-}
-
-variable vault_data_bucket {
+variable vault_bucket_name {
   description = "The bucket name to store encrypted vault information."
 }
 
