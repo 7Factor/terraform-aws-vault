@@ -22,6 +22,5 @@ utility_accessible_sg = "BASTION-SG"
 lb_security_policy    = "ELBSecurityPolicy-FS-2018-06"
 
 # Vault specific
-vault_count              = 2
-vault_data_bucket        = "BUKKIT"
-vault_data_bucket_region = "us-east-1"
+vault_count       = 2
+vault_bucket_name = "BUKKIT"
