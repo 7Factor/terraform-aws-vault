@@ -45,9 +45,9 @@ variable lb_security_policy {
   description = "Vault UI SSL policy to apply to the ELB."
 }
 
-variable lb_internal {
+variable external_lb_enabled {
   default     = false
-  description = "Whether or not the vault load balancer is internal or not."
+  description = "Whether or not the external vault load balancer is turned on or not."
 }
 
 variable public_subnets {
