@@ -1,5 +1,5 @@
 resource "aws_lb" "vault_internal_lb" {
-  name               = "vault-lb-${data.aws_region.current.name}"
+  name               = "vault-int-lb-${data.aws_region.current.name}"
   load_balancer_type = "application"
   internal           = true
 
@@ -15,7 +15,7 @@ resource "aws_lb" "vault_internal_lb" {
 resource "aws_lb" "vault_external_lb" {
   count = var.external_lb_enabled ? 1 : 0
 
-  name               = "vault-lb-${data.aws_region.current.name}"
+  name               = "vault-pub-lb-${data.aws_region.current.name}"
   load_balancer_type = "application"
   internal           = false
 
