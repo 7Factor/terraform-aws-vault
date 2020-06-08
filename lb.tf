@@ -1,17 +1,30 @@
-# load blanacer
-resource "aws_lb" "vault_lb" {
-  name               = "vault-lb-${data.aws_region.current.name}"
+resource "aws_lb" "vault_internal_lb" {
+  name               = "vault-int-lb-${data.aws_region.current.name}"
   load_balancer_type = "application"
-  internal           = var.lb_internal
+  internal           = true
 
   subnets = flatten([var.public_subnets])
 
-  security_groups = [
-    aws_security_group.vault_httplb_sg.id,
-  ]
+  security_groups = [aws_security_group.vault_httplb_sg.id]
 
   tags = {
-    Name = "Vault LB"
+    Name = "Vault Internal LB"
+  }
+}
+
+resource "aws_lb" "vault_external_lb" {
+  count = var.external_lb_enabled ? 1 : 0
+
+  name               = "vault-pub-lb-${data.aws_region.current.name}"
+  load_balancer_type = "application"
+  internal           = false
+
+  subnets = flatten([var.public_subnets])
+
+  security_groups = [aws_security_group.vault_httplb_sg.id]
+
+  tags = {
+    Name = "Vault External LB"
   }
 }
 
@@ -39,7 +52,7 @@ resource "aws_lb_target_group_attachment" "vault_lb_target_attachments" {
 }
 
 resource "aws_lb_listener" "vault_lb_listener" {
-  load_balancer_arn = aws_lb.vault_lb.arn
+  load_balancer_arn = aws_lb.vault_internal_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = var.lb_security_policy
@@ -52,7 +65,7 @@ resource "aws_lb_listener" "vault_lb_listener" {
 }
 
 resource "aws_lb_listener" "vault_lb_redirect" {
-  load_balancer_arn = aws_lb.vault_lb.arn
+  load_balancer_arn = aws_lb.vault_internal_lb.arn
   port              = "80"
   protocol          = "HTTP"
 
