@@ -13,32 +13,15 @@ resource "aws_lb" "vault_internal_lb" {
   }
 }
 
+# no need for ssl on internal lb
 resource "aws_lb_listener" "vault_int_lb_listener" {
-  load_balancer_arn = aws_lb.vault_internal_lb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = var.lb_security_policy
-  certificate_arn   = var.vault_cert_arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.vault_int_lb_target.arn
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "vault_int_lb_redirect" {
   load_balancer_arn = aws_lb.vault_internal_lb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    target_group_arn = aws_lb_target_group.vault_int_lb_target.arn
+    type             = "forward"
   }
 }
 
