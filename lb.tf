@@ -1,6 +1,6 @@
 # internal lb config, intended to be primary
 resource "aws_lb" "vault_internal_lb" {
-  name               = "vault-int-lb-${data.aws_region.current.name}"
+  name               = "vault-int-lb"
   load_balancer_type = "application"
   internal           = true
 
@@ -52,7 +52,7 @@ resource "aws_lb_target_group_attachment" "vault_int_lb_target_attachments" {
 resource "aws_lb" "vault_external_lb" {
   count = var.external_lb_enabled ? 1 : 0
 
-  name               = "vault-pub-lb-${data.aws_region.current.name}"
+  name               = "vault-pub-lb"
   load_balancer_type = "application"
   internal           = false
 

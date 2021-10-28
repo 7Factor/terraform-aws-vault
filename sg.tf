@@ -1,6 +1,6 @@
 resource "aws_security_group" "vault_sg" {
-  name        = "vault-sg-${data.aws_region.current.name}"
-  description = "Security group for all vault servers in ${data.aws_region.current.name}."
+  name        = "vault-boxes"
+  description = "Security group for all vault servers."
   vpc_id      = var.vpc_id
 
   # access 8200 for api / ui
@@ -42,8 +42,8 @@ resource "aws_security_group_rule" "vault_peer_communication" {
 }
 
 resource "aws_security_group" "vault_httplb_sg" {
-  name        = "vault-lb-sg-${data.aws_region.current.name}"
-  description = "Security group for the LB in ${data.aws_region.current.name}."
+  name        = "vault-lb"
+  description = "Security group for the LB."
   vpc_id      = var.vpc_id
 
   ingress {

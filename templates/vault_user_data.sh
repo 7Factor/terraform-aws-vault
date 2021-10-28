@@ -62,4 +62,5 @@ ExecStart=/etc/bin/vault server \
 WantedBy=multi-user.target
 " > /etc/systemd/system/vault.service
 
+systemctl enable vault
 systemctl start vault

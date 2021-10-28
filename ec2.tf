@@ -1,12 +1,10 @@
-data "template_file" "vault_initialization" {
-  template = file("${path.module}/templates/vault_user_data.sh")
-
-  vars = {
-    region                  = data.aws_region.current.name
-    vault_version           = var.vault_version
-    vault_fqdn              = var.vault_fqdn
-    vault_bucket_name       = var.vault_bucket_name
-    vault_autounseal_key_id = aws_kms_key.vault_autounseal.key_id
+locals {
+  vault_interpolation_vars = {
+    "region"                  = data.aws_region.current.name
+    "vault_version"           = var.vault_version
+    "vault_fqdn"              = var.vault_fqdn
+    "vault_bucket_name"       = var.vault_bucket_name
+    "vault_autounseal_key_id" = aws_kms_key.vault_autounseal.key_id
   }
 }
 
@@ -33,7 +31,7 @@ resource "aws_instance" "vault" {
     Name = "Vault Server ${count.index + 1}"
   }
 
-  user_data = base64encode(data.template_file.vault_initialization.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/vault_user_data.sh", local.vault_interpolation_vars))
 }
 
 resource "aws_iam_instance_profile" "vault_instance_profile" {
@@ -65,6 +63,15 @@ resource "aws_iam_role" "vault_role" {
   ]
 }
 EOF
+}
+
+data "aws_iam_policy" "aws_ssm_default" {
+  name = "AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "add_ssm_for_patching" {
+  role       = aws_iam_role.vault_role.name
+  policy_arn = data.aws_iam_policy.aws_ssm_default.arn
 }
 
 resource "aws_iam_policy" "vault_policy" {
