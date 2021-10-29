@@ -29,6 +29,7 @@ resource "aws_instance" "vault" {
 
   tags = {
     Name = "Vault Server ${count.index + 1}"
+    PatchGroup = local.ecs_patch_group_name
   }
 
   user_data = base64encode(templatefile("${path.module}/templates/vault_user_data.sh", local.vault_interpolation_vars))
