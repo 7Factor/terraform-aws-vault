@@ -28,7 +28,7 @@ resource "aws_instance" "vault" {
   ]
 
   tags = {
-    Name = "Vault Server ${count.index + 1}"
+    Name       = "Vault Server ${count.index + 1}"
     PatchGroup = local.ecs_patch_group_name
   }
 

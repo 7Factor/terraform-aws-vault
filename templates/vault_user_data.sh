@@ -1,7 +1,5 @@
 #!/bin/bash
-sudo apt-get update
-sudo unattended-upgrade -d
-sudo apt-get install -y unzip
+sudo yum install -y unzip
 
 # install vault
 sudo mkdir -p /etc/vault/
