@@ -121,3 +121,23 @@ path "concourse/*" {
   capabilities = ["read", "list"]
 } 
 ```
+## Migrating to Terraform Registry version
+
+We have migrated this module to the
+[Terraform Registry](https://registry.terraform.io/modules/7Factor/vault/aws/latest)! Going forward, you should
+endeavour to use the registry as the source for this module. It is also **highly recommended** that you migrate existing
+projects to the new source at your earliest convenience. Using it in this way, you can select a range of versions to use
+in your service which allows us to make potentially breaking changes to the module without breaking your service.
+
+**Note:** The development for version 2 and higher of this module will continue on the `main` branch rather than
+`master`. This is to ensure that existing users of the module are not affected by breaking changes. We will continue to
+maintain the `master` branch for bug fixes and security patches.
+
+### Migration instructions
+
+You need to change the module source from the GitHub url to `7Factor/vault/aws`. This will pull the module from
+the Terraform registry. You should also add a version to the module block.
+
+**Major version 1 is intended to maintain backwards compatibility with the old module source.** To use the new module
+source and maintain compatibility, set your version to `"~> 1"`. This means you will receive any updates that are
+backwards compatible with the old module.
